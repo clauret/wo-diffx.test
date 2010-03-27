@@ -1,0 +1,9 @@
+
+syntax: regexp
+^release$
+syntax: regexp
+^desktop\.ini$
+syntax: regexp
+^tmp$
+syntax: regexp
+^doc$

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  @author Christophe Lauret
+  @version 12 May 2005
+-->
+<project default="release">
+
+  <description>
+  This buildfile is used to manage the java data for the Diff-X Test project
+  </description>
+
+  <!-- set global properties for this build -->
+  <property name="src"     value="src"/>
+  <property name="classes" value="classes"/>
+  <property name="release" value="release"/>
+  <property name="lib"     value="lib"/>
+  <property name="doc"     value="doc"/>
+  <property name="version" value="0.7"/>
+
+  <!-- initialise -->
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${classes}"/>
+  </target>
+
+  <!-- compile the java code from ${src} into ${classes} -->
+  <target name="compile" depends="init" description="compile source (use *.jar in /lib directory)">
+    <javac srcdir="${src}" destdir="${classes}" debug="off"/>
+  </target>
+
+  <!-- generate the documentation -->
+  <target name="javadoc" depends="compile">
+     <javadoc destdir="${doc}" access="public" 
+         use="true" 
+       notree="false" 
+       nonavbar="false" 
+       noindex="false" 
+       splitindex="true" 
+       author="true" version="true" 
+       nodeprecatedlist="false" 
+       nodeprecated="false" 
+       packagenames="com.topologi.*" 
+       sourcepath="${src}"
+       classpath="${classes}"
+       stylesheetfile="${dir.resource}/javadoc.css"
+       doctitle="${name.display} ${version} API">
+        <link href="http://java.sun.com/javase/6/docs/api/"/>
+        <link href="http://www.weborganic.org/apidoc/diffx/core/"/>
+        <link href="http://junit.sourceforge.net/javadoc/"/>
+      </javadoc>
+  </target>
+
+  <!-- release the current version in a jar -->
+  <target name="release" depends="javadoc" description="archive source and build with date stamp">
+    <!-- create all directories -->
+    <mkdir dir="${release}"/>
+    <mkdir dir="${release}\${DSTAMP}"/>
+    <!-- zip and jar -->
+    <zip zipfile="${release}/${DSTAMP}/diffx-test-${version}-src.zip" basedir="${src}"/>
+    <zip zipfile="${release}/${DSTAMP}/diffx-test-${version}-docs.zip" basedir="${doc}"/>
+    <jar jarfile="${release}/${DSTAMP}/diffx-test-${version}.jar" basedir="${classes}" index="true"/>
+    <zip zipfile="${release}/${DSTAMP}/diffx-test-${version}-all.zip" basedir="." 
+    	 includes="src/**, classes/**, doc/**, data/**"/>
+  </target>
+
+  <!-- clean up -->
+  <target name="clean" description="delete build directory and remove lib and classes directory from Tomcat">
+    <delete dir="${classes}"/>
+  </target>
+
+</project>
