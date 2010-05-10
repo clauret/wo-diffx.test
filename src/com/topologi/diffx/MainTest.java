@@ -100,6 +100,10 @@ public final class MainTest {
   static {
     config.setIgnoreWhiteSpace(true);
     config.setPreserveWhiteSpace(false);
+    config.setWhiteSpaceProcessing(com.topologi.diffx.config.WhiteSpaceProcessing.IGNORE);
+    config.setGranularity(com.topologi.diffx.config.TextGranularity.TEXT);
+    System.err.println(config.getWhiteSpaceProcessing());
+    System.err.println(config.getGranularity());
   }
 
   /**
@@ -147,11 +151,12 @@ public final class MainTest {
         File infoFile = new File(rc, "info.txt");
         PrintStream info = new PrintStream(new BufferedOutputStream(new FileOutputStream(infoFile)), true);
         // print the sequences
-        printSequence(xml1, info);
-        printSequence(xml2, info);
+        EventSequence s1 = printSequence(xml1, info);
+        EventSequence s2 = printSequence(xml2, info);
         // process the diff
-        processDiffX(xml1, xml2, info);
-        processDiffX(xml2, xml1, info);
+        long ta = processDiffX(xml1, xml2, info);
+        long tb = processDiffX(xml2, xml1, info);
+        System.out.println("Processed "+uc.getName()+" "+s1.size()+"x"+s2.size()+" in "+ta+"ms | "+tb+"ms ("+xml1.length()+"x"+xml1.length()+")");
       }
     }
   }
@@ -167,7 +172,8 @@ public final class MainTest {
    * 
    * @throws IOException Should an error occur.
    */
-  private void processDiffX(File xml1, File xml2, PrintStream info) throws IOException {
+  private long processDiffX(File xml1, File xml2, PrintStream info) throws IOException {
+    long t = 0;
     info.println("Executing the diff-x as");
     // output
     int x = xml1.getName().compareTo(xml2.getName());
@@ -181,8 +187,8 @@ public final class MainTest {
       System.setErr(info);
 //      Main.diff(xmlr1, xmlr2, diff, config);
       Main.diff(toNode(xml1, true), toNode(xml2, true), diff, config);
-      long t1 = new Date().getTime();
-      info.println("Processed in "+(t1 - t0)+"ms");
+      t = new Date().getTime() - t0;
+      info.println("Processed in "+t+"ms");
       System.setErr(tmp);
     } catch (Exception ex) {
       System.setErr(tmp);
@@ -196,17 +202,19 @@ public final class MainTest {
       info.flush();
     }
     verifyWellFormed(out, info);
+    return t;
   }
 
   /**
    * Prints the sequence of the given XML.
    * 
-   * @param xml  The XML doc whcih sequence needs to be printed.;
-   * @param info Where the additionnal information goes.
+   * @param xml  The XML doc which sequence needs to be printed.;
+   * @param info Where the additional information goes.
    * 
    * @throws IOException Should an error occur.
    */
-  private void printSequence(File xml, PrintStream info) throws IOException {
+  private EventSequence printSequence(File xml, PrintStream info) throws IOException {
+    EventSequence s = new EventSequence(); 
     // report the sequence of tokens
     SAXRecorder recorder = new SAXRecorder();
     if (config != null) recorder.setConfig(config);
@@ -214,9 +222,9 @@ public final class MainTest {
     info.println("  file = "+xml.getParent()+"\\"+xml.getName());
     info.println("::start__");
     try {
-      EventSequence seq1 = recorder.process(xml);
+      s = recorder.process(xml);
       TestFormatter tf1 = new TestFormatter();
-      tf1.format(seq1);
+      tf1.format(s);
       info.println(tf1.getOutput());
     } catch (LoadingException ex) {
       info.println("Could no print the sequence, because of the following error:");
@@ -227,6 +235,7 @@ public final class MainTest {
     }
     info.println("::end__");
     info.println();
+    return s;
   }
 
   /**
