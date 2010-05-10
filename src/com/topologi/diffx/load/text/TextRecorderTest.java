@@ -111,7 +111,7 @@ public final class TextRecorderTest extends TestCase {
   }
 
   /**
-   * Tests parsing the &amp;lt;, it should remaine the same.
+   * Tests parsing the &amp;lt;, it should remain the same.
    * 
    * @throws IOException Should an I/O exception occur.
    * @throws DiffXException Should an error occur while reading the text.
