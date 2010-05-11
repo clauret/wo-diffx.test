@@ -51,7 +51,7 @@ import com.topologi.diffx.test.TestUtils;
  * 2. add the two files to compare as 'a.xml' and 'b.xml'   
  * 
  * @author Christophe Lauret
- * @version 27 March 2010
+ * @version 11 May 2010
  */
 public final class MainTest {
 
@@ -98,12 +98,9 @@ public final class MainTest {
    */
   private static DiffXConfig config = new DiffXConfig();
   static {
-    config.setIgnoreWhiteSpace(true);
-    config.setPreserveWhiteSpace(false);
     config.setWhiteSpaceProcessing(com.topologi.diffx.config.WhiteSpaceProcessing.IGNORE);
-    config.setGranularity(com.topologi.diffx.config.TextGranularity.TEXT);
-    System.err.println(config.getWhiteSpaceProcessing());
-    System.err.println(config.getGranularity());
+    config.setGranularity(com.topologi.diffx.config.TextGranularity.WORD);
+    System.err.println("Config: "+config.getWhiteSpaceProcessing()+" "+config.getGranularity());
   }
 
   /**
@@ -156,7 +153,8 @@ public final class MainTest {
         // process the diff
         long ta = processDiffX(xml1, xml2, info);
         long tb = processDiffX(xml2, xml1, info);
-        System.out.println("Processed "+uc.getName()+" "+s1.size()+"x"+s2.size()+" in "+ta+"ms | "+tb+"ms ("+xml1.length()+"x"+xml1.length()+")");
+        System.out.println("Processed "+uc.getName()+" "+s1.size()+"x"+s2.size()+" in "+ta+"ms | "+tb+"ms ("+xml1.length()+"x"+xml2.length()+") "+
+            ((xml1.length()+xml2.length()) / (s1.size()+s2.size())));
       }
     }
   }
@@ -168,7 +166,7 @@ public final class MainTest {
    * 
    * @param xml1 The first XML doc.
    * @param xml2 The second XML doc.
-   * @param info The print writer where additionnal info goes.
+   * @param info The print writer where additional info goes.
    * 
    * @throws IOException Should an error occur.
    */
@@ -218,9 +216,20 @@ public final class MainTest {
     // report the sequence of tokens
     SAXRecorder recorder = new SAXRecorder();
     if (config != null) recorder.setConfig(config);
-    info.println("Printing sequence....");
+    info.println("Printing sequence");
     info.println("  file = "+xml.getParent()+"\\"+xml.getName());
-    info.println("::start__");
+    try {
+      long t0 = System.nanoTime();
+      s = recorder.process(xml);
+      long t1 = System.nanoTime();
+      info.println("  size = "+s.size());
+      info.println("  loading time = "+(t1-t0)+"nanoseconds");
+    } catch (LoadingException ex) {
+      info.println("Could no print the sequence, because of the following error:");
+      ex.printStackTrace(info);
+    }
+    info.println("  size = "+s.size());
+    info.println("::start");
     try {
       s = recorder.process(xml);
       TestFormatter tf1 = new TestFormatter();
@@ -233,7 +242,7 @@ public final class MainTest {
       info.println("Could no print the sequence, because of the following error:");
       ex.printStackTrace(info);
     }
-    info.println("::end__");
+    info.println("::end");
     info.println();
     return s;
   }
