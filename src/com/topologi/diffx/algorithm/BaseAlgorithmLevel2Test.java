@@ -163,5 +163,4 @@ public abstract class BaseAlgorithmLevel2Test extends BaseAlgorithmLevel1Test {
     assertDiffXMLOK(xml2, xml1, exp2);
   }
 
-  
 }
