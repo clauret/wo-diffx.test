@@ -7,27 +7,28 @@
  */
 package com.topologi.diffx.xml.esc;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
+import java.io.IOException;
+import java.io.StringWriter;
+
 import org.junit.Test;
 
 /**
  * A test class for the XML escape tool.
  *
  * @author Christophe Lauret
- * @version 7 February 2005
+ * @version 0.7.7
  */
-public final class XMLEscapeUTF8Test extends XMLEscapeUTF8TestBase{
-
-  private final XMLEscape esc = XMLEscapeUTF8.UTF8_ESCAPE;
+public final class XMLEscapeWriterASCIITest extends XMLEscapeASCIITestBase {
 
   /**
    * Test the attribute escape method for <code>null</code>.
    */
-  @Test public void testToAttributeValue_Null() throws IOException {
+  @Test
+  public void testToAttributeValue_Null() throws IOException {
     String got = escapeAttribute(null);
-    Assert.assertNull(got);
+    assertEquals("", got);
   }
 
   /**
@@ -35,16 +36,24 @@ public final class XMLEscapeUTF8Test extends XMLEscapeUTF8TestBase{
    */
   @Test public void testToElementText_Null() throws IOException {
     String got = escapeText(null);
-    Assert.assertNull(got);
+    assertEquals("", got);
+  }
+
+
+  @Override
+  public String escapeAttribute(String value) throws IOException {
+    StringWriter got = new StringWriter();
+    XMLEscapeWriterASCII esc = new XMLEscapeWriterASCII(got);
+    esc.writeAttValue(value);
+    return got.toString();
   }
 
   @Override
-  String escapeAttribute(String value) throws IOException {
-    return this.esc.toAttributeValue(value);
+  public String escapeText(String value) throws IOException {
+    StringWriter got = new StringWriter();
+    XMLEscapeWriterASCII esc = new XMLEscapeWriterASCII(got);
+    esc.writeText(value);
+    return got.toString();
   }
 
-  @Override
-  String escapeText(String value) throws IOException {
-    return this.esc.toElementText(value);
-  }
 }

@@ -2,7 +2,7 @@
  * This file is part of the DiffX library.
  *
  * For licensing information please see the file license.txt included in the release.
- * A copy of this licence can also be found at 
+ * A copy of this licence can also be found at
  *   http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.topologi.diffx.load.text;
@@ -22,7 +22,7 @@ import com.topologi.diffx.event.impl.SpaceEvent;
 
 /**
  * Test case for the tokenizer.
- * 
+ *
  * @author Christophe Lauret
  * @version 10 May 2010
  */
@@ -30,7 +30,7 @@ public final class TokenizerByCharTest {
 
   /**
    * Tests that a <code>NullPointerException</code> is thrown for a </code>null</code>
-   * character sequence. 
+   * character sequence.
    */
   @Test public void testNull() {
     try {
@@ -71,15 +71,16 @@ public final class TokenizerByCharTest {
    * Tests that the tokeniser counts the correct number of tokens.
    */
   @Test public void testCountToken2() {
-    assertEquals(1, new CharactersTokeniser(" ").countTokens());
-    assertEquals(2, new CharactersTokeniser("  a").countTokens());
-    assertEquals(2, new CharactersTokeniser("aa ").countTokens());
-    assertEquals(2, new CharactersTokeniser(" aa").countTokens());
-    assertEquals(2, new CharactersTokeniser("a  ").countTokens());
-    assertEquals(3, new CharactersTokeniser(" bb ").countTokens());
-    assertEquals(3, new CharactersTokeniser("b bb").countTokens());
-    assertEquals(3, new CharactersTokeniser("b   bb").countTokens());
-    assertEquals(4, new CharactersTokeniser("xx  yy  ").countTokens());
+    TokenizerByChar t = new TokenizerByChar();
+    assertEquals(1, t.tokenize(" ").size());
+    assertEquals(2, t.tokenize("  a").size());
+    assertEquals(2, t.tokenize("aa ").size());
+    assertEquals(2, t.tokenize(" aa").size());
+    assertEquals(2, t.tokenize("a  ").size());
+    assertEquals(3, t.tokenize(" bb ").size());
+    assertEquals(3, t.tokenize("b bb").size());
+    assertEquals(3, t.tokenize("b   bb").size());
+    assertEquals(4, t.tokenize("xx  yy  ").size());
   }
 
   /**
